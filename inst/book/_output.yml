@@ -1,0 +1,19 @@
+bookdown::gitbook:
+  css: style.css
+  config:
+    fontsettings:
+      theme: white
+    toc:
+      before: |
+        <li><a href="./">OSCA Basics</a></li>
+      after: |
+        <li><a href="https://bioconductor.org" target="blank">Published by Bioconductor</a></li>
+    download: null
+    edit: https://github.com/LTLA/OSCA.basic/edit/master/inst/book/%s
+    view: https://github.com/LTLA/OSCA.basic/blob/master/inst/book/%s
+    history: https://github.com/LTLA/OSCA.basic/commits/master/inst/book/%s
+    sharing:
+      github: yes
+      facebook: yes
+      twitter: yes
+      linkedin: yes

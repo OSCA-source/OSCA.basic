@@ -1,0 +1,26 @@
+--- 
+title: "Orchestrating Single-Cell Analysis with Bioconductor: Basics"
+documentclass: book
+bibliography: ref.bib
+biblio-style: apalike
+link-citations: yes
+favicon: "`r rebook::BiocFavicon()`"
+github-repo: "LTLA/OSCA.intro"
+---
+
+```{r, echo=FALSE}
+.gh_url <- file.path('https://github.com', rmarkdown::metadata[['github-repo']])
+```
+
+---
+date: "`r rebook::openingDetails(Source=.gh_url)`"
+url: "`r .gh_url`"
+---
+
+# Welcome {-}
+
+<a href="https://bioconductor.org"><img src="`r rebook::BiocSticker('animated')`" width="200" alt="Bioconductor Sticker" align="right" style="margin: 0 1em 0 1em" /></a> 
+
+This site contains the basic analysis chapters for the `r BiocStyle::Biocbook("OSCA", label='__"Orchestrating Single-Cell Analysis with Bioconductor"__ book')`.
+It describes the early steps of a typical single-cell RNA-seq analysis, ranging from quality control,
+normalization, various forms of dimensionality reduction, clustering and detection of marker genes.

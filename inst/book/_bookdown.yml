@@ -1,0 +1,16 @@
+book_filename: "OSCA.basic"
+pagetitle: "Orchestrating Single-Cell Analysis with Bioconductor: Basics"
+delete_merged_file: true
+new_session: true
+language:
+  ui:
+    chapter_name: "Chapter "
+output_dir: "docs"
+rmd_files: ["index.Rmd",
+    "quality-control.Rmd",
+    "normalization.Rmd",
+    "feature-selection.Rmd",
+    "reduced-dimensions.Rmd",
+    "clustering.Rmd",
+    "marker-detection.Rmd",
+    "cell-annotation.Rmd"]

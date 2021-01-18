@@ -1,0 +1,55 @@
+Package: OSCA.basic
+Title: Basics of OSCA
+Version: 0.99.0
+Date: 2021-01-17
+Authors@R: c( 
+        person('Robert', 'Amezquita', role = c('aut')), 
+        person('Aaron', 'Lun', role = c('aut', 'cre'), email="infinite.monkeys.with.keyboards@gmail.com"), 
+        person('Stephanie', 'Hicks', role = 'aut'), 
+        person('Raphael', 'Gottardo', role = 'aut') 
+    )
+Description: 
+    Deploys basic analysis chapters for the "Orchestrating Single Cell Analysis with Bioconductor" book.
+    This describes the early steps of a typical single-cell RNA-seq analysis, ranging from quality control,
+    normalization, various forms of dimensionality reduction, clustering and detection of marker genes.
+Depends: AnnotationHub,
+    AUCell,
+    BiocFileCache,
+    BiocSingular,
+    bluster,
+    celldex,
+    cluster,
+    clustree,
+    corral,
+    dendextend,
+    dynamicTreeCut,
+    edgeR,
+    ggbeeswarm,
+    gridExtra,
+    GSEABase,
+    igraph,
+    limma,
+    msigdbr,
+    org.Mm.eg.db,
+    PCAtools,
+    pheatmap,
+    rebook,
+    rmarkdown,
+    robustbase,
+    scater,
+    scran,
+    scRNAseq,
+    scuttle,
+    SingleR,
+    viridis
+Suggests: 
+    OSCA.workflows,
+    rmarkdown,
+    knitr
+VignetteBuilder: knitr
+License: CC BY
+URL: https://github.com/LTLA/OSCA.basic
+biocViews: 
+    ImmunoOncologyWorkflow,
+    Workflow, 
+    SingleCellWorkflow
