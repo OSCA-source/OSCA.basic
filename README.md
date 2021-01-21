@@ -1,4 +1,4 @@
-# Introduction to the OSCA book
+# Basics of the OSCA book
 
 This repository contains a Bioconductor package to deploy the **Basic** subbook of the **Orchestrating Single-Cell Analysis** book.
 Install all relevant packages used in the book with:
