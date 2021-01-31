@@ -186,7 +186,7 @@ These observations suggest that a more accurate noise model does not necessarily
 
 #### Fitting block-specific trends {#variance-batch}
 
-Data containing multiple batches will often exhibit batch effects (see Chapter \@ref(data-integration) for more details).
+Data containing multiple batches will often exhibit batch effects (see Chapter `r link("integrating-datasets","OSCA.advanced")` for more details).
 We are usually not interested in HVGs that are driven by batch effects.
 Rather, we want to focus on genes that are highly variable within each batch.
 This is naturally achieved by performing trend fitting and variance decomposition separately for each batch.
@@ -347,7 +347,7 @@ It will also preserve a weak but consistent effect across many genes with small 
 
 The obvious cost is that more noise is also captured, which can reduce the resolution of otherwise well-separated populations and mask the secondary signal that we were trying to preserve.
 The use of more genes also introduces more computational work in each downstream step.
-This strategy is thus best suited to very heterogeneous populations containing many different cell types (possibly across many datasets that are to be merged, as in Chapter \@ref(integrating-datasets)) where there is a justified fear of ignoring marker genes for low-abundance subpopulations under a competitive top $X$ approach.
+This strategy is thus best suited to very heterogeneous populations containing many different cell types (possibly across many datasets that are to be merged, as in `r link("integrating-datasets","OSCA.advanced")`) where there is a justified fear of ignoring marker genes for low-abundance subpopulations under a competitive top $X$ approach.
 
 ## Selecting _a priori_ genes of interest {#apriori-hvgs}
 

@@ -78,7 +78,7 @@ dim(reducedDim(sce.zeisel, "PCA"))
 
 For large data sets, greater efficiency is obtained by using approximate SVD algorithms that only compute the top PCs.
 By default, most PCA-related functions in `r Biocpkg("scater")` and `r Biocpkg("scran")` will use methods from the `r CRANpkg("irlba")` or `r CRANpkg("rsvd")` packages to perform the SVD.
-We can explicitly specify the SVD algorithm to use by passing an `BiocSingularParam` object (from the `r Biocpkg("BiocSingular")` package) to the `BSPARAM=` argument (see Section \@ref(big-data-svd) for more details).
+We can explicitly specify the SVD algorithm to use by passing an `BiocSingularParam` object to the `BSPARAM=` argument (see `r link("big-data-svd", "OSCA.advanced")` for more details).
 Many of these approximate algorithms are based on randomization and thus require `set.seed()` to obtain reproducible results.
 
 ```{r}
