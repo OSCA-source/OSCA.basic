@@ -10,8 +10,10 @@ Authors@R: c(
     )
 Description: 
     Deploys basic analysis chapters for the "Orchestrating Single Cell Analysis with Bioconductor" book.
-    This describes the early steps of a typical single-cell RNA-seq analysis, ranging from quality control,
-    normalization, various forms of dimensionality reduction, clustering and detection of marker genes.
+    This describes the steps of a simple single-cell RNA-seq analysis, involving quality control,
+    normalization, various forms of dimensionality reduction, clustering into subpopulations, 
+    detection of marker genes, and annotation of cell types. It is intended for users who already
+    have some familiarity with R and want to get hands-on with some basic single-cell analyses.
 Depends: AnnotationHub,
     AUCell,
     BiocFileCache,

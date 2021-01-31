@@ -22,5 +22,10 @@ url: "`r .gh_url`"
 <a href="https://bioconductor.org"><img src="`r rebook::BiocSticker('animated')`" width="200" alt="Bioconductor Sticker" align="right" style="margin: 0 1em 0 1em" /></a> 
 
 This site contains the basic analysis chapters for the `r BiocStyle::Biocbook("OSCA", label='__"Orchestrating Single-Cell Analysis with Bioconductor"__ book')`.
-It describes the early steps of a typical single-cell RNA-seq analysis, ranging from quality control,
-normalization, various forms of dimensionality reduction, clustering and detection of marker genes.
+```{r, results="asis", echo=FALSE}
+text <- packageDescription("OSCA.basic")$Description
+remainders <- strsplit(text, "\\.\\s")[[1]][-1]
+remainders <- sub("^\\s+", "", remainders)
+remainders <- paste(remainders, collapse=". ")
+cat(remainders, sep="\n")
+```
