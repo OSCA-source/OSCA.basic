@@ -1,7 +1,4 @@
 all: compiled
 
 compiled: 
-	rm -rf book/ && cp -r ../inst/book book
-	cd book && "${R_HOME}/bin/R" -e "bookdown::render_book('index.Rmd')"
-	mkdir ../inst/doc && mv book/docs ../inst/doc/book
-	rm -rf book/
+	"${R_HOME}/bin/R" -e "work.dir <- rebook::getBookCache('OSCA.basic'); rebook::preCompileBook('../inst/book', work.dir=work.dir, desc='../DESCRIPTION'); old.dir <- setwd(work.dir); bookdown::render_book('index.Rmd'); setwd(old.dir); rebook::postCompileBook(work.dir=work.dir, final.dir='../inst/doc/book')"
