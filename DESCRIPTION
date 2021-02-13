@@ -48,7 +48,7 @@ Depends: AnnotationHub,
     SingleR,
     statmod,
     viridis
-Imports:
+Imports: 
     OSCA.workflows
 Suggests: 
     rmarkdown,
