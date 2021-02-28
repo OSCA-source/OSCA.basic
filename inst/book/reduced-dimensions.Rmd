@@ -385,8 +385,9 @@ If two cells have the same expression profile but differences in their total cou
 However, CA is more sensitive to overdispersion in the random noise due to the nature of its standardization.
 This may cause some problems in some datasets where the CA factors may be driven by a few genes with random expression rather than the underlying biological structure. 
 
-```{r corral-sort, fig.width=10, fig.height=6, fig.cap="Dimensionality reduction results of all pool-and-split libraries in the SORT-seq CellBench data, computed by a PCA on the log-normalized expression values (left) or using the _corral_ package (right). Each point represents a library and is colored by the mixing ratio used to construct it."}
-# TODO: move to scRNAseq.
+```{r}
+# TODO: move to scRNAseq. The rm(env) avoids problems with knitr caching inside
+# rebook's use of callr::r() during compilation.
 library(BiocFileCache)
 bfc <- BiocFileCache(ask=FALSE)
 qcdata <- bfcrpath(bfc, "https://github.com/LuyiTian/CellBench_data/blob/master/data/mRNAmix_qc.RData?raw=true")
@@ -394,8 +395,13 @@ qcdata <- bfcrpath(bfc, "https://github.com/LuyiTian/CellBench_data/blob/master/
 env <- new.env()
 load(qcdata, envir=env)
 sce.8qc <- env$sce8_qc
-sce.8qc$mix <- factor(sce.8qc$mix)
+rm(env)
 
+sce.8qc$mix <- factor(sce.8qc$mix)
+sce.8qc
+```
+
+```{r corral-sort, fig.width=10, fig.height=6, fig.cap="Dimensionality reduction results of all pool-and-split libraries in the SORT-seq CellBench data, computed by a PCA on the log-normalized expression values (left) or using the _corral_ package (right). Each point represents a library and is colored by the mixing ratio used to construct it."}
 # Choosing some HVGs for PCA:
 sce.8qc <- logNormCounts(sce.8qc)
 dec.8qc <- modelGeneVar(sce.8qc)
