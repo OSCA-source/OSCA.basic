@@ -46,7 +46,7 @@ It is entirely possible to run `SingleR()` on the raw counts without any _a prio
 and filter on the annotation results at one's leisure - see the book for an explanation.
 
 ```{r, echo=FALSE, results="asis"}
-extractFromPackage(path="tenx-unfiltered-pbmc4k.Rmd", package="OSCA.workflows",
+extractFromPackage("tenx-unfiltered-pbmc4k.Rmd", package="OSCA.workflows",
     chunk="clustering", objects="sce.pbmc")
 ```
 
