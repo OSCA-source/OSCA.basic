@@ -69,6 +69,7 @@ The `subsets_Mito_percent` column contains the percentage of reads mapped to mit
 Finally, the `altexps_ERCC_percent` column contains the percentage of reads mapped to ERCC transcripts.
 
 ```{r}
+# Identifying the mitochondrial transcripts in our SingleCellExperiment.
 location <- rowRanges(sce.416b)
 is.mito <- any(seqnames(location)=="MT")
 
@@ -92,7 +93,7 @@ colnames(colData(sce.416b))
 A key assumption here is that the QC metrics are independent of the biological state of each cell.
 Poor values (e.g., low library sizes, high mitochondrial proportions) are presumed to be driven by technical factors rather than biological processes, meaning that the subsequent removal of cells will not misrepresent the biology in downstream analyses.
 Major violations of this assumption would potentially result in the loss of cell types that have, say, systematically low RNA content or high numbers of mitochondria.
-We will check for such violations using diagnostic plots described in Section \@ref(quality-control-plots).
+We can check for such violations using diagnostic plots described in Section \@ref(quality-control-plots) and `r link("qc-discard-cell-types", "OSCA.advanced")`.
 
 ## Identifying low-quality cells
 
@@ -162,7 +163,7 @@ attr(reasons$low_n_features, "thresholds")
 
 With this strategy, the thresholds adapt to both the location and spread of the distribution of values for a given metric.
 This allows the QC procedure to adjust to changes in sequencing depth, cDNA capture efficiency, mitochondrial content, etc. without requiring any user intervention or prior experience.
-However, it does require some implicit assumptions that are discussed below in more detail.
+However, it does require some implicit assumptions that are discussed in more detail in `r link("outlier-assumptions", "OSCA.advanced")`.
 
 ### Other approaches
 
