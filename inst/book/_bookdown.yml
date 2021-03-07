@@ -1,5 +1,5 @@
 book_filename: "OSCA.basic"
-pagetitle: "Orchestrating Single-Cell Analysis with Bioconductor: Basics"
+pagetitle: "Basics of Single-Cell Analysis with Bioconductor"
 delete_merged_file: true
 new_session: true
 language:
