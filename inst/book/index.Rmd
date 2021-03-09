@@ -1,5 +1,5 @@
 --- 
-title: "Orchestrating Single-Cell Analysis with Bioconductor: Basics"
+title: "Basics of Single-Cell Analysis with Bioconductor"
 documentclass: book
 bibliography: ref.bib
 biblio-style: apalike
