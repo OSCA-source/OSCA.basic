@@ -200,6 +200,7 @@ sce.416b$phenotype <- ifelse(grepl("induced", sce.416b$phenotype),
     "induced", "wild type")
 sce.416b$discard <- reasons$discard
 
+library(scater)
 gridExtra::grid.arrange(
     plotColData(sce.416b, x="block", y="sum", colour_by="discard",
         other_fields="phenotype") + facet_wrap(~phenotype) + 
