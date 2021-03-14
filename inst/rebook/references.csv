@@ -141,16 +141,11 @@ motivation,normalization.html,2.1
 library-size-normalization,normalization.html,2.2
 normalization-by-deconvolution,normalization.html,2.3
 spike-norm,normalization.html,2.4
-applying-the-size-factors,normalization.html,2.5
-normalization-transformation,normalization.html,2.5.1
-downsampling-and-log-transforming,normalization.html,2.5.2
-other-options,normalization.html,2.5.3
+normalization-transformation,normalization.html,2.5
 fig:histlib,normalization.html,2.1
 fig:deconv-zeisel,normalization.html,2.2
 fig:norm-spike-t,normalization.html,2.3
 fig:norm-effect-malat,normalization.html,2.4
-fig:cellbench-lognorm-fail,normalization.html,2.5
-fig:cellbench-lognorm-downsample,normalization.html,2.6
 quality-control,quality-control.html,1
 quality-control-motivation,quality-control.html,1.1
 common-choices-of-qc-metrics,quality-control.html,1.2
