@@ -163,7 +163,7 @@ attr(reasons$low_n_features, "thresholds")
 
 With this strategy, the thresholds adapt to both the location and spread of the distribution of values for a given metric.
 This allows the QC procedure to adjust to changes in sequencing depth, cDNA capture efficiency, mitochondrial content, etc. without requiring any user intervention or prior experience.
-However, it does require some implicit assumptions that are discussed in more detail in `r link("outlier-assumptions", "OSCA.advanced")`.
+However, the underlying assumption of a high-quality majority may not always be appropriate, which is discussed in more detail in `r link("outlier-assumptions", "OSCA.advanced")`.
 
 ### Other approaches
 
