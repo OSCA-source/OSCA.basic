@@ -125,7 +125,7 @@ These observations suggest that a more accurate noise model does not necessarily
 
 ## Handling batch effects {#variance-batch}
 
-Data containing multiple batches will often exhibit batch effects - see `r link("integrating-datasets","OSCA.advanced")` for more details.
+Data containing multiple batches will often exhibit batch effects - see `r link("integrating-datasets","OSCA.multisample")` for more details.
 We are usually not interested in HVGs that are driven by batch effects; instead, we want to focus on genes that are highly variable within each batch.
 This is naturally achieved by performing trend fitting and variance decomposition separately for each batch.
 We demonstrate this approach by treating each plate (`block`) in the 416B dataset as a different batch, using the `modelGeneVarWithSpikes()` function.

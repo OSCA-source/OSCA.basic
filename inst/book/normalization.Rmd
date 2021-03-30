@@ -18,12 +18,6 @@ They typically arise from technical differences in cDNA capture or PCR amplifica
 Normalization aims to remove these differences such that they do not interfere with comparisons of the expression profiles between cells.
 This ensures that any observed heterogeneity or differential expression within the cell population are driven by biology and not technical biases.
 
-At this point, it is worth noting the difference between normalization and batch correction (`r link("integrating-datasets","OSCA.advanced")`).
-Normalization occurs regardless of the batch structure and only considers technical biases, while batch correction - as the name suggests - only occurs across batches and must consider both technical biases and biological differences.
-Technical biases tend to affect genes in a similar manner, or at least in a manner related to their biophysical properties (e.g., length, GC content), while biological differences between batches can be highly unpredictable.
-As such, these two tasks involve different assumptions and generally involve different computational methods (though some packages aim to perform both steps at once, e.g., `r Biocpkg("zinbwave")`).
-Thus, it is important to avoid conflating "normalized" and "batch-corrected" data, as these usually refer to different things.
-
 We will mostly focus our attention on scaling normalization, which is the simplest and most commonly used class of normalization strategies. 
 This involves dividing all counts for each cell by a cell-specific scaling factor, often called a "size factor" [@anders2010differential].
 The assumption here is that any cell-specific bias (e.g., in capture or amplification efficiency) affects all genes equally via scaling of the expected mean count for that cell.
