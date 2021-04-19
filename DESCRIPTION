@@ -52,7 +52,7 @@ Suggests:
     OSCA.advanced
 VignetteBuilder: knitr
 License: CC BY 4.0
-URL: https://github.com/LTLA/OSCA.basic
+URL: https://github.com/OSCA-source/OSCA.basic
 biocViews: 
     ImmunoOncologyWorkflow,
     Workflow, 
