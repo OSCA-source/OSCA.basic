@@ -15,6 +15,7 @@ Description:
     detection of marker genes, and annotation of cell types. It is intended for users who already
     have some familiarity with R and want to get hands-on with some basic single-cell analyses.
 Depends: AnnotationHub,
+    apcluster,
     AUCell,
     BiocFileCache,
     BiocSingular,

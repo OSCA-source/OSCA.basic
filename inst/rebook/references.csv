@@ -26,7 +26,7 @@ vector-quantization-with-k-means,clustering.html,5.3
 background-1,clustering.html,5.3.1
 implementation-1,clustering.html,5.3.2
 in-two-step-procedures,clustering.html,5.3.3
-using-a-distance-matrix,clustering.html,5.4
+hierarchical-clustering,clustering.html,5.4
 background-2,clustering.html,5.4.1
 implementation-2,clustering.html,5.4.2
 in-two-step-procedures-again,clustering.html,5.4.3
@@ -42,8 +42,9 @@ fig:dend-cluster,clustering.html,5.8
 fig:tsne-416b,clustering.html,5.9
 fig:tsne-kmeans-hclust-pbmc,clustering.html,5.10
 fig:dendroid-pbmc,clustering.html,5.11
-fig:ccr7-dist-memory,clustering.html,5.12
-fig:cd48-memory-expression,clustering.html,5.13
+fig:tsne-kmeans-affinity-pbmc,clustering.html,5.12
+fig:ccr7-dist-memory,clustering.html,5.13
+fig:cd48-memory-expression,clustering.html,5.14
 dimensionality-reduction,dimensionality-reduction.html,4
 overview,dimensionality-reduction.html,4.1
 principal-components-analysis,dimensionality-reduction.html,4.2
