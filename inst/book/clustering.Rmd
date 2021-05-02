@@ -330,12 +330,13 @@ at the cost of requiring more computational work by the second-step clustering p
 Note that the second step operates on the centroids, so increasing `clusters=` may have further implications if the second-stage procedure is sensitive to the total number of input observations. 
 For example, increasing the number of centroids would require an concomitant increase in `k=` (the number of neighbors in graph construction) to maintain the same level of resolution in the final output.
 
-## Using a distance matrix
+## Hierarchical clustering
 
 ### Background
 
-Hierarchical clustering involves agglomerating samples into clusters, then agglomerating those clusters into larger clusters, and so on until all samples belong to a single cluster. 
-This yields a dendrogram that can be cust at different heights to define clusters with different granularity.
+Hierarchical clustering is an old technique that arranges samples into a hierarchy based on their relative similarity to each other.
+Most implementations do so by joining the most similar samples into a new cluster, then joining similar clusters into larger clusters, and so on, until all samples belong to a single cluster. 
+This process yields obtain a dendrogram that defines clusters with progressively increasing granularity.
 Variants of hierarchical clustering methods primarily differ in how they choose to perform the agglomerations.
 For example, complete linkage aims to merge clusters with the smallest maximum distance between their elements, while Ward's method aims to minimize the increase in within-cluster variance.
 
@@ -345,8 +346,8 @@ Cutting the dendrogram at high resolution is also guaranteed to yield clusters t
 this can be helpful for interpretation, as discussed in Section \@ref(subclustering).
 The dendrogram is also a natural representation of the data in situations where cells have descended from a relatively recent common ancestor.
 
-In practice, hierachical clustering is too slow to be used for anything but the smallest scRNA-seq datasets.
-Most variants require a cell-cell distance matrix that is prohibitively expensive to compute for many cells.
+In practice, hierarchical clustering is too slow to be used for anything but the smallest scRNA-seq datasets.
+Most implementations require a cell-cell distance matrix that is prohibitively expensive to compute for a large number of cells.
 Greedy agglomeration is also likely to result in a quantitatively suboptimal partitioning (as defined by the agglomeration measure) at higher levels of the dendrogram when the number of cells and merge steps is high.
 Nonetheless, we will still demonstrate the application of hierarchical clustering here as it can be useful when combined with vector quantization techniques like $k$-means.
 
@@ -428,7 +429,7 @@ To obtain explicit clusters, we "cut" the tree by removing internal branches suc
 This is most simply done by removing internal branches above a certain height of the tree, as performed by the `cutree()` function.
 A more sophisticated variant of this approach is implemented in the `r CRANpkg("dynamicTreeCut")` package,
 which uses the shape of the branches to obtain a better partitioning for complex dendrograms (Figure \@ref(fig:dend-cluster)).
-Here, the most relevant parameter is `deepSplit=` to control the resolution of the resulting clusters.
+We enable this option by setting `cut.dynamic=TRUE`, with additional tweaking of the `deepSplit=` parameter to control the resolution of the resulting clusters.
 
 ```{r dend-cluster, fig.cap="Hierarchy of cells in the 416B data set after hierarchical clustering, where each leaf node is a cell that is coloured according to its assigned cluster identity from a dynamic tree cut."}
 hclust.dyn <- clusterCells(sce.416b, use.dimred="PCA",
@@ -468,7 +469,7 @@ stopifnot(names(sil.out[which.max(sil.out)])=="2")
 Returning to our PBMC example, we can use a two-step approach to perform hierarchical clustering on the representative centroids (Figure \@ref(fig:tsne-kmeans-hclust-pbmc)).
 This avoids the construction of a distance matrix across all cells for faster computation.
 
-```{r tsne-kmeans-hclust-pbmc, fig.cap="$t$-SNE plot of the PBMC dataset, where each point represents a cell and is coloured according to the identity of the assigned cluster from combined $k$-means/hierarhical clustering."}
+```{r tsne-kmeans-hclust-pbmc, fig.cap="$t$-SNE plot of the PBMC dataset, where each point represents a cell and is coloured according to the identity of the assigned cluster from combined $k$-means/hierarchical clustering."}
 # Setting the seed due to the randomness of k-means.
 set.seed(1111)
 khclust.info <- clusterCells(sce.pbmc, use.dimred="PCA",
@@ -488,9 +489,9 @@ plotTSNE(sce.pbmc, colour_by=I(khclust.info$clusters),
 With a little bit of work, we can also examine the dendrogram constructed on the centroids (Figure \@ref(fig:dendroid-pbmc)).
 This provides a more quantitative visualization of the relative similarities between the different subpopulations.
 
-```{r dendroid-pbmc, fig.cap="Dendrogram of the $k$-mean centroids after hierarchical clustering in the PBMC dataset."}
+```{r dendroid-pbmc, fig.cap="Dendrogram of the $k$-mean centroids after hierarchical clustering in the PBMC dataset. Each leaf node represents a representative cluster of cells generated by $k$-mean clustering."}
 k.stats <- khclust.info$objects$first
-tree.pbmc <- khclust.info$objects$second
+tree.pbmc <- khclust.info$objects$second$hclust
 
 m <- match(as.integer(tree.pbmc$labels), k.stats$cluster)
 final.clusters <- khclust.info$clusters[m]
@@ -501,6 +502,36 @@ dend <- as.dendrogram(tree.pbmc, hang=0.1)
 labels_colors(dend) <- as.integer(final.clusters)[order.dendrogram(dend)]
 
 plot(dend)
+```
+
+As an aside, the same approach can be used to speed up any clustering method based on a distance matrix.
+For example, we could subject our $k$-means centroids to clustering by affinity propagation [@frey2007clustering].
+In this procedure, each sample (i.e., centroid) chooses itself or another sample as its "exemplar", 
+with the suitability of the choice dependent on the distance between the samples, other potential exemplars for each sample, and the other samples with the same chosen exemplar.
+Iterative updates of these choices yields a set of clusters where each cluster is defined from the samples assigned to the same exemplar (Figure \@ref(fig:tsne-kmeans-affinity-pbmc)) 
+Unlike hierarchical clustering, this does not provide a dendrogram, but it also avoids the extra complication of a tree cut - 
+resolution is primarily controlled via the `q=` parameter, which defines the strength with which a sample considers itself as an exemplar and thus forms its own cluster.
+
+```{r, echo=FALSE}
+# Note technically necessary, but just throwing it in here
+# so that it gets picked up by the dependency scraper.
+library(apcluster)
+```
+
+```{r tsne-kmeans-affinity-pbmc, fig.cap="$t$-SNE plot of the PBMC dataset, where each point represents a cell and is coloured according to the identity of the assigned cluster from combined $k$-means/affinity propagation clustering."}
+# Setting the seed due to the randomness of k-means.
+set.seed(1111)
+kaclust.info <- clusterCells(sce.pbmc, use.dimred="PCA",
+    BLUSPARAM=TwoStepParam(
+        first=KmeansParam(centers=1000),
+        second=AffinityParam(q=0.1) # larger q => more clusters
+    ),
+    full=TRUE
+)
+table(kaclust.info$clusters)
+
+plotTSNE(sce.pbmc, colour_by=I(kaclust.info$clusters), 
+    text_by=I(kaclust.info$clusters))
 ```
 
 ## Subclustering {#subclustering}
