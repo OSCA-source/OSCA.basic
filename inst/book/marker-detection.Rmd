@@ -56,7 +56,7 @@ For each cluster, we can then rank candidate markers based on one of these effec
 We demonstrate below with the mean AUC for cluster 1 (Figure \@ref(fig:pbmc-scored-markers-1));
 the next section will go into more detail on the differences between the various columns.
 
-```{r pbmc-scored-markers-1, fig.height=10, fig.width=6, fig.cap="Distribution of expression values across clusters for the top potential marker genes from cluster 1 in the PBMC dataset."}
+```{r pbmc-scored-markers-1, fig.height=10, fig.width=8, fig.cap="Distribution of expression values across clusters for the top potential marker genes from cluster 1 in the PBMC dataset."}
 chosen <- marker.info[["1"]]
 ordered <- chosen[order(chosen$mean.AUC, decreasing=TRUE),1:4]
 head(ordered)
@@ -136,7 +136,7 @@ The choice of summary determines the stringency of the marker selection strategy
 For identifying upregulated genes, ranking by the minimum is the most stringent and the maximum is the least stringent;
 the mean and median fall somewhere in between and are reasonable defaults for most applications.
 
-```{r pbmc-scored-markers-again, fig.height=10, fig.width=6, fig.cap="Distribution of expression values across clusters for the top potential marker genes from cluster 4 in the PBMC dataset."}
+```{r pbmc-scored-markers-again, fig.height=10, fig.width=8, fig.cap="Distribution of expression values across clusters for the top potential marker genes from cluster 4 in the PBMC dataset."}
 chosen <- marker.info[["4"]] # using another cluster, for some variety.
 ordered <- chosen[order(chosen$median.logFC.cohen,decreasing=TRUE),]
 head(ordered)
@@ -158,7 +158,7 @@ and it may be worth examining some of the lowest-ranked genes to see if there is
 
 ```{r}
 # Omitting the decreasing=TRUE to focus on negative effects.
-ordered <- chosen[order(chosen$median.logFC.cohen),]
+ordered <- chosen[order(chosen$median.logFC.cohen),1:4]
 head(ordered)
 ```
 
@@ -183,7 +183,7 @@ The effect sizes are then averaged across batches to obtain a single value per c
 
 ```{r}
 demo <- m.out[["1"]] 
-demo[order(demo$median.logFC.cohen, decreasing=TRUE),]
+demo[order(demo$median.logFC.cohen, decreasing=TRUE),1:4]
 ```
 
 The `block=` argument works for all effect sizes shown above and is robust to differences in the log-fold changes or variance between batches.
