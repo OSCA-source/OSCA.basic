@@ -34,8 +34,6 @@ sce.pbmc
 
 ## Scoring markers by pairwise comparisons
 
-### Overview
-
 Our general strategy is to compare each pair of clusters and compute scores quantifying the differences in the expression distributions between clusters.
 The scores for all pairwise comparisons involving a particular cluster are then consolidated into a single `DataFrame` for that cluster.
 The `scoreMarkers()` function from `r Biocpkg("scran")` returns a list of `DataFrame`s where each `DataFrame` corresponds to a cluster and each row of the `DataFrame` corresponds to a gene.
@@ -53,32 +51,38 @@ colnames(marker.info[["1"]]) # statistics for marker 1.
 ```
 
 For each cluster, we can then rank candidate markers based on one of these effect size summaries.
-We demonstrate below with the mean AUC for cluster 1 (Figure \@ref(fig:pbmc-scored-markers-1));
-the next section will go into more detail on the differences between the various columns.
+We demonstrate below with the mean AUC for cluster 1, which probably contains NK cells based on the top genes in Figure \@ref(fig:pbmc-scored-markers-1) (and no _CD3E_ expression).
+The next section will go into more detail on the differences between the various columns.
 
 ```{r pbmc-scored-markers-1, fig.height=10, fig.width=8, fig.cap="Distribution of expression values across clusters for the top potential marker genes from cluster 1 in the PBMC dataset."}
 chosen <- marker.info[["1"]]
-ordered <- chosen[order(chosen$mean.AUC, decreasing=TRUE),1:4]
-head(ordered)
+ordered <- chosen[order(chosen$mean.AUC, decreasing=TRUE),]
+head(ordered[,1:4]) # showing basic stats only, for brevity.
 
 library(scater)
 plotExpression(sce.pbmc, features=head(rownames(ordered)), 
     x="label", colour_by="label")
 ```
 
+```{r, echo=FALSE}
+# Also noting that CD3 is not highly expressed.
+stopifnot(which("CD3E"==rownames(ordered)) > 10000)
+stopifnot(all(c("GNLY", "NKG7") %in% head(rownames(ordered))))
+```
+
 We deliberately use pairwise comparisons rather than comparing each cluster to the average of all other cells.
 The latter approach is sensitive to the population composition, which introduces an element of unpredictability to the marker sets due to variation in cell type abundances.
 (In the worst case, the presence of one subpopulation containing a majority of the cells will drive the selection of top markers for every other cluster, pushing out useful genes that can distinguish between the smaller subpopulations.)
-Moreover, pairwise comparisons naturally provide more information to interpret of the utility of a marker, e.g., by providing log-fold changes to indicate which clusters are distinguished by each gene.
+Moreover, pairwise comparisons naturally provide more information to interpret of the utility of a marker, e.g., by providing log-fold changes to indicate which clusters are distinguished by each gene (Section \@ref(obtaining-the-full-effects)).
 
-### Available effect sizes
+## Available effect sizes
 
 In the context of marker detection, the area under the curve (AUC) quantifies our ability to distinguish between two distributions in a pairwise comparison.
 The AUC represents the probability that a randomly chosen observation from our cluster of interest is greater than a randomly chosen observation from the other cluster.
 A value of 1 corresponds to upregulation, where all values of our cluster of interest are greater than any value from the other cluster;
 a value of 0.5 means that there is no net difference in the location of the distributions;
 and a value of 0 corresponds to downregulation.
-The AUC is closely related to the U statistic in the Wilcoxon ranked sum test (a.k.a., Mann-Whitney U-test).
+The AUC is closely related to the $U$ statistic in the Wilcoxon ranked sum test (a.k.a., Mann-Whitney U-test).
 
 ```{r}
 auc.only <- chosen[,grepl("AUC", colnames(chosen))]
@@ -106,7 +110,11 @@ detect.only <- chosen[,grepl("logFC.detected", colnames(chosen))]
 detect.only[order(detect.only$mean.logFC.detected,decreasing=TRUE),]
 ```
 
-### Summarizing pairwise effects 
+The AUC or Cohen's $d$ is usually the best choice for general purpose marker detection, as they are effective regardless of the magnitude of the expression values.
+The log-fold change in the detected proportion is specifically useful for identifying binary changes in expression.
+See Section XXX for more information about the practical differences between the effect sizes.
+
+## Summarizing pairwise effects 
 
 For each gene, our pairwise comparisons generate a large number of effect sizes that are relevant to each cluster.
 Specifically, in a dataset with $N$ clusters, each cluster has $N-1$ values for any effect size described in the previous section.
@@ -129,22 +137,33 @@ Conversely, if the minimum is small (<0 for the log-fold changes, <0.5 for the A
 Conversely, if the maximum is small, we can conclude that the gene is downregulated in $X$ compared to all other clusters.
 Both the minimum and maximum can also be helpful for diagnosing discrepancies between the mean and median, as the former is much more sensitive to the extremes than the latter.
 
+```{r, echo=FALSE}
+target <- "4"
+```
+
 Each of these summaries is computed for each effect size, for each gene, and for each cluster.
 Our next step is to choose one of these summary statistics for one of the effect sizes and to use it to rank the rows of the `DataFrame`.
-The example below uses the median Cohen's $d$ to obtain a ranking of upregulated markers for cluster 4 (Figure \@ref(fig:pbmc-scored-markers-again)).
 The choice of summary determines the stringency of the marker selection strategy, i.e., how many other clusters must we differ from?
 For identifying upregulated genes, ranking by the minimum is the most stringent and the maximum is the least stringent;
 the mean and median fall somewhere in between and are reasonable defaults for most applications.
+The example below uses the median Cohen's $d$ to obtain a ranking of upregulated markers for cluster `r target` (Figure \@ref(fig:pbmc-scored-markers-again)), which probably contains monocytes.
 
-```{r pbmc-scored-markers-again, fig.height=10, fig.width=8, fig.cap="Distribution of expression values across clusters for the top potential marker genes from cluster 4 in the PBMC dataset."}
+```{r pbmc-scored-markers-again, fig.height=10, fig.width=8, fig.cap=sprintf("Distribution of expression values across clusters for the top potential marker genes from cluster %s in the PBMC dataset.", target)}
 chosen <- marker.info[["4"]] # using another cluster, for some variety.
 ordered <- chosen[order(chosen$median.logFC.cohen,decreasing=TRUE),]
-head(ordered)
+head(ordered[,1:4]) # showing basic stats only, for brevity.
 plotExpression(sce.pbmc, features=head(rownames(ordered)), 
     x="label", colour_by="label")
 ```
 
-When it works, the minimum can be highly effective as it yields a concise set of highly cluster-specific markers. 
+```{r, echo=FALSE}
+# Higher CD14 than CD16.
+stopifnot(which("CD14"==rownames(ordered)) < 50)
+stopifnot(which("FCGR3A"==rownames(ordered)) > 500)
+stopifnot(all(c("LYZ", "S100A9", "S100A8") %in% head(rownames(ordered))))
+```
+
+On some occasions, the minimum can be highly effective as it yields a concise set of highly cluster-specific markers. 
 However, any gene that is expressed at the same level in two or more clusters will simply not be detected. 
 This is likely to discard many interesting genes, especially if the clusters are finely resolved with weak separation.
 To give a concrete example, consider a mixed population of CD4^+^-only, CD8^+^-only, double-positive and double-negative T cells.
@@ -160,6 +179,47 @@ and it may be worth examining some of the lowest-ranked genes to see if there is
 # Omitting the decreasing=TRUE to focus on negative effects.
 ordered <- chosen[order(chosen$median.logFC.cohen),1:4]
 head(ordered)
+```
+
+## Obtaining the full effects
+
+For more complex questions, we may need to interrogate effect sizes from specific comparisons of interest.
+To do so, we set `full.stats=TRUE` to obtain the effect sizes for all pairwise comparisons involving a particular cluster.
+This is returned in the form of a nested `DataFrame` for each effect size type - 
+in the example below, `full.AUC` contains the AUCs for the comparisons between cluster `r target` and every other cluster.
+
+```{r}
+marker.info <- scoreMarkers(sce.pbmc, colLabels(sce.pbmc), full.stats=TRUE)
+chosen <- marker.info[["4"]]
+chosen$full.AUC
+```
+
+Say we want to identify the genes that distinguish cluster 4 from other clusters with high _LYZ_ expression.
+We subset `full.AUC` to the relevant comparisons and sort on the row means to obtain a ranking of up- and downregulated markers.
+This allows us to easily characterize subtle differences between closely related clusters.
+
+```{r}
+lyz.high <- c("6", "8", "9", "14") # based on inspection of the previous Figure.
+subset <- chosen$full.AUC[,lyz.high]
+subset[order(rowMeans(as.matrix(subset)), decreasing=TRUE),]
+```
+
+```{r, echo=FALSE}
+# Checking that the others listed are, indeed, LYZ high.
+for (i in lyz.high) {
+    out <- marker.info[[i]]
+    stopifnot(out["LYZ", "median.AUC"] > 0.9)
+}
+```
+
+Similarly, we can use the full set of effect sizes to define our own summary statistic if the precomputed measures are too coarse.
+For example, we may be interested in markers that are upregulated against some percentage - say, 80% - of other clusters.
+This improves the cluster specificity of the ranking by being more stringent than the median yet not as strigent as the minimum.
+We achieve this by computing and sorting on the 20^th^ percentile of effect sizes, as shown below.
+
+```{r}
+stat <- rowQuantiles(as.matrix(chosen$full.AUC), p=0.2)
+chosen[order(stat, decreasing=TRUE), 1:4] # just showing the basic stats for brevity.
 ```
 
 ## Handling blocking factors {#marker-batch}
@@ -180,10 +240,15 @@ m.out <- scoreMarkers(sce.416b, colLabels(sce.416b), block=sce.416b$block)
 For each gene, each pairwise comparison between clusters is performed separately in each level of the blocking factor - in this case, the plate of origin.
 By comparing within each batch, we cancel out any batch effects so that they are not conflated with the biological differences between subpopulations.
 The effect sizes are then averaged across batches to obtain a single value per comparison, using a weighted mean that accounts for the number of cells involved in the comparison in each batch.
+A similar correction is applied to the mean log-expression and proportion of detected cells inside and outside each cluster.
 
-```{r}
+```{r blocked-markers-416b, fig.height=6, fig.width=6, fig.cap="Distribution of expression values across clusters for the top potential marker genes from cluster 1 in the 416B dataset. Each point represents a cell and is colored by the batch of origin."}
 demo <- m.out[["1"]] 
-demo[order(demo$median.logFC.cohen, decreasing=TRUE),1:4]
+ordered <- demo[order(demo$median.logFC.cohen, decreasing=TRUE),]
+ordered[,1:4]
+
+plotExpression(sce.416b, features=rownames(ordered)[1:6],
+    x="label", colour_by="block")
 ```
 
 The `block=` argument works for all effect sizes shown above and is robust to differences in the log-fold changes or variance between batches.
