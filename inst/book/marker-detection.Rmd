@@ -34,6 +34,10 @@ sce.pbmc
 
 ## Scoring markers by pairwise comparisons
 
+```{r, echo=FALSE}
+target <- "1"
+```
+
 Our general strategy is to compare each pair of clusters and compute scores quantifying the differences in the expression distributions between clusters.
 The scores for all pairwise comparisons involving a particular cluster are then consolidated into a single `DataFrame` for that cluster.
 The `scoreMarkers()` function from `r Biocpkg("scran")` returns a list of `DataFrame`s where each `DataFrame` corresponds to a cluster and each row of the `DataFrame` corresponds to a gene.
@@ -47,14 +51,14 @@ and finally, a variety of effect size summaries generated from all pairwise comp
 library(scran)
 marker.info <- scoreMarkers(sce.pbmc, colLabels(sce.pbmc))
 marker.info
-colnames(marker.info[["1"]]) # statistics for marker 1.
+colnames(marker.info[["1"]]) # statistics for cluster 1.
 ```
 
 For each cluster, we can then rank candidate markers based on one of these effect size summaries.
-We demonstrate below with the mean AUC for cluster 1, which probably contains NK cells based on the top genes in Figure \@ref(fig:pbmc-scored-markers-1) (and no _CD3E_ expression).
+We demonstrate below with the mean AUC for cluster `r target`, which probably contains NK cells based on the top genes in Figure \@ref(fig:pbmc-scored-markers-1) (and no _CD3E_ expression).
 The next section will go into more detail on the differences between the various columns.
 
-```{r pbmc-scored-markers-1, fig.height=10, fig.width=8, fig.cap="Distribution of expression values across clusters for the top potential marker genes from cluster 1 in the PBMC dataset."}
+```{r pbmc-scored-markers-1, fig.height=10, fig.width=8, fig.cap=sprintf("Distribution of expression values across clusters for the top potential marker genes (as determined by the mean AUC) for cluster %s in the PBMC dataset.", target)}
 chosen <- marker.info[["1"]]
 ordered <- chosen[order(chosen$mean.AUC, decreasing=TRUE),]
 head(ordered[,1:4]) # showing basic stats only, for brevity.
@@ -65,6 +69,9 @@ plotExpression(sce.pbmc, features=head(rownames(ordered)),
 ```
 
 ```{r, echo=FALSE}
+# Checking the code and text are synced.
+stopifnot(identical(chosen[1,], marker.info[[target]][1,]))
+
 # Also noting that CD3 is not highly expressed.
 stopifnot(which("CD3E"==rownames(ordered)) > 10000)
 stopifnot(all(c("GNLY", "NKG7") %in% head(rownames(ordered))))
@@ -116,26 +123,23 @@ See Section XXX for more information about the practical differences between the
 
 ## Summarizing pairwise effects 
 
-For each gene, our pairwise comparisons generate a large number of effect sizes that are relevant to each cluster.
-Specifically, in a dataset with $N$ clusters, each cluster has $N-1$ values for any effect size described in the previous section.
-To simplify interpretation, we summarize the set of effects for each cluster by computing the mean, median, minimum and maximum value across all comparisons involving that cluster.
+In a dataset with $N$ clusters, each cluster is associated with $N-1$ values for each type of effect size described in the previous section.
+To simplify interpretation, we summarize the effects for each cluster into some key statistics such as the mean and median.
 Each summary statistic has a different interpretation when used for ranking:
 
 - The most obvious summary statistic is the mean.
 For cluster $X$, a large mean effect size (>0 for the log-fold changes, >0.5 for the AUCs) indicates that the gene is upregulated in $X$ compared to the average of the other groups.
-In practice, a weighted mean is used where the effect size from any particular comparison is weighted according to the number of cells involved.
-This ensures that statistics from comparisons with very few cells do not skew the summaries;
-however, the weight is also capped beyond a "sufficient" number of cells (default 100), such that comparisons involving very large clusters do not dominate the calculated mean. 
 - Another summary statistic is the median, where a large value indicates that the gene is upregulated in $X$ compared to most (>50%) other clusters.
-The median provides greater robustness to outliers than the mean - this may or may not be desirable.
-On one hand, it avoids an inflated effect size if only a minority of comparisons have large effects;
+The median provides greater robustness to outliers than the mean, which may or may not be desirable.
+On one hand, the median avoids an inflated effect size if only a minority of comparisons have large effects;
 on the other hand, it will also overstate the effect size by ignoring a minority of comparisons that have opposing effects.
-- The minimum value is an interesting summary for identifying upregulated genes, as a large value indicates that the gene is upregulated in $X$ compared to _all_ other clusters.
-Ranking by the minimum effect is highly stringent as a large minimum can only be obtained if strong upregulation must be observed in every comparison between $X$ and another cluster.
+- The minimum value (`min.*`) is the most stringent summary for identifying upregulated genes, as a large value indicates that the gene is upregulated in $X$ compared to _all_ other clusters.
 Conversely, if the minimum is small (<0 for the log-fold changes, <0.5 for the AUCs), we can conclude that the gene is downregulated in $X$ compared to at least one other cluster.
-- The maximum value is the least stringent summary for identifying upregulated genes, as a large value can be obtained if there is strong upregulation in $X$ compared to _any_ other cluster.
+- The maximum value (`max.*`) is the least stringent summary for identifying upregulated genes, as a large value can be obtained if there is strong upregulation in $X$ compared to _any_ other cluster.
 Conversely, if the maximum is small, we can conclude that the gene is downregulated in $X$ compared to all other clusters.
-Both the minimum and maximum can also be helpful for diagnosing discrepancies between the mean and median, as the former is much more sensitive to the extremes than the latter.
+- The top rank (`rank.*`) is the smallest rank of each gene across all pairwise comparisons.
+Specifically, genes are ranked _within_ each pairwise comparison based on decreasing effect size, and then the smallest rank _across_ all comparisons is reported for each gene.
+If a gene has a small top rank, we can conclude that it is one of the top upregulated genes in at least one comparison of $X$ to another cluster.
 
 ```{r, echo=FALSE}
 target <- "4"
@@ -148,7 +152,7 @@ For identifying upregulated genes, ranking by the minimum is the most stringent 
 the mean and median fall somewhere in between and are reasonable defaults for most applications.
 The example below uses the median Cohen's $d$ to obtain a ranking of upregulated markers for cluster `r target` (Figure \@ref(fig:pbmc-scored-markers-again)), which probably contains monocytes.
 
-```{r pbmc-scored-markers-again, fig.height=10, fig.width=8, fig.cap=sprintf("Distribution of expression values across clusters for the top potential marker genes from cluster %s in the PBMC dataset.", target)}
+```{r pbmc-scored-markers-again, fig.height=10, fig.width=8, fig.cap=sprintf("Distribution of expression values across clusters for the top potential marker genes (as determined by the median Cohen's $d$) for cluster %s in the PBMC dataset.", target)}
 chosen <- marker.info[["4"]] # using another cluster, for some variety.
 ordered <- chosen[order(chosen$median.logFC.cohen,decreasing=TRUE),]
 head(ordered[,1:4]) # showing basic stats only, for brevity.
@@ -157,17 +161,37 @@ plotExpression(sce.pbmc, features=head(rownames(ordered)),
 ```
 
 ```{r, echo=FALSE}
+# Checking the code and text are synced.
+stopifnot(identical(chosen[1,], marker.info[[target]][1,]))
+
 # Higher CD14 than CD16.
 stopifnot(which("CD14"==rownames(ordered)) < 50)
 stopifnot(which("FCGR3A"==rownames(ordered)) > 500)
 stopifnot(all(c("LYZ", "S100A9", "S100A8") %in% head(rownames(ordered))))
 ```
 
-On some occasions, the minimum can be highly effective as it yields a concise set of highly cluster-specific markers. 
+On some occasions, ranking by the minimum can be highly effective as it yields a concise set of highly cluster-specific markers. 
 However, any gene that is expressed at the same level in two or more clusters will simply not be detected. 
 This is likely to discard many interesting genes, especially if the clusters are finely resolved with weak separation.
 To give a concrete example, consider a mixed population of CD4^+^-only, CD8^+^-only, double-positive and double-negative T cells.
 Neither _Cd4_ or _Cd8_ would be detected as subpopulation-specific markers because each gene is expressed in two subpopulations such that the minimum effect would be small.
+In practice, the minimum and maximum are most helpful for diagnosing discrepancies between the mean and median, rather than being used directly for ranking.
+
+Ranking genes by the top rank is similiar in stringency to ranking by the maximum effect size, in that both will respond to strong DE in a single comparison.
+However, the top rank is more useful as it ensures that a single comparison to another cluster with consistently large effects does not dominate the ranking.
+If we select all genes with top ranks less than or equal to $T$, the resulting set is the union of the top $T$ genes from all pairwise comparisons.
+This guarantees that our set contains at least $T$ genes that can distinguish our cluster of interest from any other cluster, 
+which permits a comprehensive determination of a cluster's identity.
+We demonstrate below for cluster `r target`, taking the top $T=5$ genes with the largest Cohen's $d$ from each comparison to display in Figure \@ref(fig:pbmc-grouped-ranked-heat).
+
+```{r pbmc-grouped-ranked-heat, fig.cap=sprintf("Heatmap of the centered average log-expression values for the top potential marker genes for cluster %s in the PBMC dataset. The set of markers was selected as those genes with top ranks for Cohen's $d$ less than or equal to 5.", target)}
+ordered <- chosen[order(chosen$rank.logFC.cohen),]
+top.ranked <- ordered[ordered$rank.logFC.cohen <= 5,]
+rownames(top.ranked)
+
+plotGroupedHeatmap(sce.pbmc, features=rownames(top.ranked), group="label", 
+    center=TRUE, zlim=c(-3, 3))
+```
 
 Our discussion above has focused mainly on potential markers that are upregulated in our cluster of interest, as these are the easiest to interpret and experimentally validate.
 However, it also means that any cluster defined by downregulation of a marker will not contain that gene among the top features. 
@@ -280,67 +304,6 @@ Variances are also assumed to be equal across groups, which is not true in gener
 In particular, the presence of clusters in which a gene is silent will shrink the residual variance towards zero, preventing the model from penalizing genes with high variance in other clusters.
 Thus, we generally recommend the use of `block=` where possible.
 -->
-
-## Invalidity of $p$-values {#p-value-invalidity}
-
-### From data snooping
-
-Previous editions of this chapter used $p$-values from the tests corresponding to each effect size, e.g., Welch's $t$-test, the Wilcoxon ranked sum test.
-While this is acceptable for ranking genes, the $p$-values themselves are statistically flawed and are of little use for inference.
-This is because the DE analysis is performed on the same data used to obtain the clusters, which represents "data dredging" (also known as fishing or data snooping).
-The hypothesis of interest - are there differences between clusters? - is formulated from the data, so we are more likely to get a positive result when we re-use the data set to test that hypothesis.
-
-The practical effect of data dredging is best illustrated with a simple simulation.
-We simulate i.i.d. normal values, perform $k$-means clustering and test for DE between clusters of cells with `findMarkers()`.
-The resulting distribution of $p$-values is heavily skewed towards low values (Figure \@ref(fig:pval-dist)).
-Thus, we can detect "significant" differences between clusters even in the absence of any real substructure in the data.
-This effect arises from the fact that clustering, by definition, yields groups of cells that are separated in expression space.
-Testing for DE genes between clusters will inevitably yield some significant results as that is how the clusters were defined.
-
-```{r pval-dist, fig.cap="Distribution of $p$-values from a DE analysis between two clusters in a simulation with no true subpopulation structure."}
-library(scran)
-set.seed(0)
-y <- matrix(rnorm(100000), ncol=200)
-clusters <- kmeans(t(y), centers=2)$cluster
-out <- findMarkers(y, clusters)
-hist(out[[1]]$p.value, col="grey80", xlab="p-value")
-```
-
-For marker gene detection, this effect is largely harmless as the $p$-values are used only for ranking.
-However, it becomes an issue when the $p$-values are used to define "significant differences" between clusters with respect to an error rate threshold.
-Meaningful interpretation of error rates require consideration of the long-run behavior, i.e., the rate of incorrect rejections if the experiment were repeated many times.
-The concept of statistical significance for differences between clusters is not applicable if clusters and their interpretations are not stably reproducible across (hypothetical) replicate experiments.
-
-### Nature of replication {#false-replicates}
-
-The naive application of DE analysis methods will treat counts from the same cluster of cells as replicate observations.
-This is not the most relevant level of replication when cells are derived from the same biological sample (i.e., cell culture, animal or patient).
-DE analyses that treat cells as replicates fail to properly model the sample-to-sample variability [@lun2017overcoming].
-The latter is arguably the more important level of replication as different samples will necessarily be generated if the experiment is to be replicated.
-Indeed, the use of cells as replicates only masks the fact that the sample size is actually one in an experiment involving a single biological sample.
-This reinforces the inappropriateness of using the marker gene $p$-values to perform statistical inference.
-
-We strongly recommend selecting some markers for use in validation studies with an independent replicate population of cells.
-A typical strategy is to identify a corresponding subset of cells that express the upregulated markers and do not express the downregulated markers.
-Ideally, a different technique for quantifying expression would also be used during validation, e.g., fluorescent _in situ_ hybridisation or quantitative PCR.
-This confirms that the subpopulation genuinely exists and is not an artifact of the scRNA-seq protocol or the computational analysis.
-
-## Further comments
-
-One consequence of the DE analysis strategy is that markers are defined relative to subpopulations in the same dataset.
-Biologically meaningful genes will not be detected if they are expressed uniformly throughout the population, e.g., T cell markers will not be detected if only T cells are present in the dataset.
-In practice, this is usually only a problem when the experimental data are provided without any biological context - certainly, we would hope to have some _a priori_ idea about what cells have been captured.
-For most applications, it is actually desirable to avoid detecting such genes as we are interested in characterizing heterogeneity  within the context of a known cell population.
-Continuing from the example above, the failure to detect T cell markers is of little consequence if we already know we are working with T cells.
-Nonetheless, if "absolute" identification of cell types is necessary, we discuss some strategies for doing so in Chapter \@ref(cell-type-annotation).
-
-Alternatively, marker detection can be performed by treating gene expression as a predictor variable for cluster assignment.
-For a pair of clusters, we can find genes that discriminate between them by performing inference with a logistic model where the outcome for each cell is whether it was assigned to the first cluster and the lone predictor is the expression of each gene.
-Treating the cluster assignment as the dependent variable is more philosophically pleasing in some sense, as the clusters are indeed defined from the expression data rather than being known in advance.
-(Note that this does not solve the data snooping problem.)
-In practice, this approach effectively does the same task as a Wilcoxon rank sum test in terms of quantifying separation between clusters.
-Logistic models have the advantage in that they can easily be extended to block on multiple nuisance variables, though this is not typically necessary in most use cases.
-Even more complex strategies use machine learning methods to determine which features contribute most to successful cluster classification, but this is probably unnecessary for routine analyses.
 
 ## Session Info {-}
 
