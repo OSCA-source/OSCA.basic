@@ -82,6 +82,11 @@ The latter approach is sensitive to the population composition, which introduces
 (In the worst case, the presence of one subpopulation containing a majority of the cells will drive the selection of top markers for every other cluster, pushing out useful genes that can distinguish between the smaller subpopulations.)
 Moreover, pairwise comparisons naturally provide more information to interpret of the utility of a marker, e.g., by providing log-fold changes to indicate which clusters are distinguished by each gene (Section \@ref(obtaining-the-full-effects)).
 
+Previous editions of this chapter used $p$-values from the tests corresponding to each effect size, e.g., Welch's $t$-test, the Wilcoxon ranked sum test.
+While this is fine for ranking genes, the $p$-values themselves are statistically flawed and are of little use for inference -
+see `r link("p-value-invalidity", "OSCA.advanced")` for more details.
+The `scoreMarkers()` function simplifies the marker detection procedure by omitting the $p$-values altogether, instead focusing on the underlying effect sizes.
+
 ## Available effect sizes
 
 In the context of marker detection, the area under the curve (AUC) quantifies our ability to distinguish between two distributions in a pairwise comparison.
@@ -100,7 +105,7 @@ Cohen's $d$ is a standardized log-fold change where the difference in the mean l
 In other words, it is the number of standard deviations that separate the means of the two groups.
 The interpretation is similar to the log-fold change; positive values indicate that the gene is upregulated in our cluster of interest, 
 negative values indicate downregulation and values close to zero indicate that there is little difference.
-Cohen's $d$ is roughly analogous to the $t$-statistic in Welch's two-sample $t$-test.
+Cohen's $d$ is roughly analogous to the $t$-statistic in Student's two-sample $t$-test.
 
 ```{r}
 cohen.only <- chosen[,grepl("logFC.cohen", colnames(chosen))]
@@ -119,7 +124,7 @@ detect.only[order(detect.only$mean.logFC.detected,decreasing=TRUE),]
 
 The AUC or Cohen's $d$ is usually the best choice for general purpose marker detection, as they are effective regardless of the magnitude of the expression values.
 The log-fold change in the detected proportion is specifically useful for identifying binary changes in expression.
-See Section XXX for more information about the practical differences between the effect sizes.
+See `r link("properties-of-each-effect-size", "OSCA.advanced")` for more information about the practical differences between the effect sizes.
 
 ## Summarizing pairwise effects 
 
