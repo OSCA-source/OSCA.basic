@@ -373,7 +373,7 @@ While both Ward's method and the default complete linkage yield compact clusters
 ```{r dend-416b, fig.cap="Hierarchy of cells in the 416B data set after hierarchical clustering, where each leaf node is a cell that is coloured according to its oncogene induction status (red is induced, blue is control) and plate of origin (light or dark)."}
 hclust.416b <- clusterCells(sce.416b, use.dimred="PCA",
     BLUSPARAM=HclustParam(method="ward.D2"), full=TRUE)
-tree.416b <- hclust.416b$objects
+tree.416b <- hclust.416b$objects$hclust
 
 # Making a prettier dendrogram.
 library(dendextend)
