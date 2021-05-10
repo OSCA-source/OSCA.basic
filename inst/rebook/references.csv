@@ -78,14 +78,10 @@ available-effect-sizes,marker-detection.html,6.3
 summarizing-pairwise-effects,marker-detection.html,6.4
 obtaining-the-full-effects,marker-detection.html,6.5
 marker-batch,marker-detection.html,6.6
-p-value-invalidity,marker-detection.html,6.7
-from-data-snooping,marker-detection.html,6.7.1
-false-replicates,marker-detection.html,6.7.2
-further-comments,marker-detection.html,6.8
 fig:pbmc-scored-markers-1,marker-detection.html,6.1
 fig:pbmc-scored-markers-again,marker-detection.html,6.2
-fig:blocked-markers-416b,marker-detection.html,6.3
-fig:pval-dist,marker-detection.html,6.4
+fig:pbmc-grouped-ranked-heat,marker-detection.html,6.3
+fig:blocked-markers-416b,marker-detection.html,6.4
 normalization,normalization.html,2
 motivation,normalization.html,2.1
 library-size-normalization,normalization.html,2.2
