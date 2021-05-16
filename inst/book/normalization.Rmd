@@ -185,13 +185,11 @@ gridExtra::grid.arrange(
 
 ```{r, echo=FALSE, results="hide"}
 # Checking that Malat1 does indeed change in its DE status
-markers1 <- findMarkers(sce.richard.deconv, groups=sce.richard$stimulus, direction="up", sorted=FALSE)
-markers2 <- findMarkers(sce.richard.spike, groups=sce.richard$stimulus, direction="up", sorted=FALSE)
+markers1 <- scoreMarkers(sce.richard.deconv, sce.richard$stimulus, full.stats=TRUE)
+markers2 <- scoreMarkers(sce.richard.spike, sce.richard$stimulus, full.stats=TRUE)
 stopifnot(
-    markers1$unstimulated["ENSMUSG00000092341","FDR"] <= 0.001,
-    markers2$unstimulated["ENSMUSG00000092341","FDR"] > 0.5,
-    all(getMarkerEffects(markers1$unstimulated["ENSMUSG00000092341",]) -
-        getMarkerEffects(markers2$unstimulated["ENSMUSG00000092341",]) > 0.1)
+    all(as.matrix(markers1$unstimulated["ENSMUSG00000092341","full.logFC.cohen"]) -
+        as.matrix(markers2$unstimulated["ENSMUSG00000092341","full.logFC.cohen"]) > 0.2)
 )
 ```
 
