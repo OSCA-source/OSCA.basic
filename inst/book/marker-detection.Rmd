@@ -87,7 +87,7 @@ While this is fine for ranking genes, the $p$-values themselves are statisticall
 see `r link("p-value-invalidity", "OSCA.advanced")` for more details.
 The `scoreMarkers()` function simplifies the marker detection procedure by omitting the $p$-values altogether, instead focusing on the underlying effect sizes.
 
-## Available effect sizes
+## Effect sizes for pairwise comparisons
 
 In the context of marker detection, the area under the curve (AUC) quantifies our ability to distinguish between two distributions in a pairwise comparison.
 The AUC represents the probability that a randomly chosen observation from our cluster of interest is greater than a randomly chosen observation from the other cluster.
@@ -101,11 +101,11 @@ auc.only <- chosen[,grepl("AUC", colnames(chosen))]
 auc.only[order(auc.only$mean.AUC,decreasing=TRUE),]
 ```
 
-Cohen's $d$ is a standardized log-fold change where the difference in the mean log-expression between groups is scaled by the pooled standard deviation.
+Cohen's $d$ is a standardized log-fold change where the difference in the mean log-expression between groups is scaled by the average standard deviation across groups.
 In other words, it is the number of standard deviations that separate the means of the two groups.
 The interpretation is similar to the log-fold change; positive values indicate that the gene is upregulated in our cluster of interest, 
 negative values indicate downregulation and values close to zero indicate that there is little difference.
-Cohen's $d$ is roughly analogous to the $t$-statistic in Student's two-sample $t$-test.
+Cohen's $d$ is roughly analogous to the $t$-statistic in various two-sample $t$-tests.
 
 ```{r}
 cohen.only <- chosen[,grepl("logFC.cohen", colnames(chosen))]
@@ -224,13 +224,18 @@ chosen$full.AUC
 ```
 
 Say we want to identify the genes that distinguish cluster 4 from other clusters with high _LYZ_ expression.
-We subset `full.AUC` to the relevant comparisons and sort on the row means to obtain a ranking of up- and downregulated markers.
+We subset `full.AUC` to the relevant comparisons and sort on our summary statistic of choice to obtain a ranking of markers within this subset.
 This allows us to easily characterize subtle differences between closely related clusters.
+To illustrate, we use the smallest rank from `computeTopRank()` to identify the top DE genes in cluster `r target` compared to the other _LYZ_-high clusters (Figure \@ref(fig:pbmc-grouped-ranked-heat2)). 
 
-```{r}
-lyz.high <- c("6", "8", "9", "14") # based on inspection of the previous Figure.
-subset <- chosen$full.AUC[,lyz.high]
-subset[order(rowMeans(as.matrix(subset)), decreasing=TRUE),]
+```{r pbmc-grouped-ranked-heat2, fig.cap=sprintf("Heatmap of the centered average log-expression values for the top potential marker genes for cluster %s relative to other _LYZ_-high clusters in the PBMC dataset. The set of markers was selected as those genes with top ranks for the AUCs.", target)}
+lyz.high <- c("4", "6", "8", "9", "14") # based on inspection of the previous Figure.
+subset <- chosen$full.AUC[,colnames(chosen$full.AUC) %in% lyz.high]
+ordered <- subset[order(computeTopRank(subset)),]
+ordered
+plotGroupedHeatmap(sce.pbmc[,colLabels(sce.pbmc) %in% lyz.high],
+    features=head(rownames(ordered), 20),
+    group="label", center=TRUE, zlim=c(-3, 3))
 ```
 
 ```{r, echo=FALSE}
@@ -250,6 +255,33 @@ We achieve this by computing and sorting on the 20^th^ percentile of effect size
 stat <- rowQuantiles(as.matrix(chosen$full.AUC), p=0.2)
 chosen[order(stat, decreasing=TRUE), 1:4] # just showing the basic stats for brevity.
 ```
+
+## Using a log-fold change threshold
+
+The Cohen's $d$ and AUC calculations consider both the magnitude of the difference between clusters as well as the variability within each cluster.
+If the variability is lower, it is possible for a gene to have a large effect size even if the magnitude of the difference is small.
+These genes tend to be somewhat uninformative for cell type identification despite their strong differential expression (e.g., ribosomal protein genes).
+We would prefer genes with larger log-fold changes between clusters, even if they have higher variability.
+
+To favor the detection of such genes, we can compute the effect sizes relative to a log-fold change threshold by setting `lfc=` in `scoreMarkers()`.
+The definition of Cohen's $d$ is generalized to the standardized difference between the observed log-fold change and the specified `lfc` threshold.
+Similarly, the AUC is redefined as the probability of randomly picking an expression value from one cluster that is greater than a random value from the other cluster plus `lfc`.
+A large positive Cohen's $d$ and an AUC above 0.5 can only be obtained if the observed log-fold change between clusters is significantly greater than `lfc`.
+We demonstrate below by obtaining the top markers for cluster 5 in the PBMC dataset with `lfc=2` (Figure \@ref(fig:pbmc-markers-5-lfc)).
+
+```{r pbmc-markers-5-lfc, fig.height=6, fig.width=6, fig.cap="Dot plot of the top potential marker genes (as determined by the mean AUC) for cluster 5 in the PBMC dataset. Each row corrresponds to a marker gene and each column corresponds to a cluster. The size of each dot represents the proportion of cells with detected expression of the gene in the cluster, while the color is proportional to the average expression across all cells in that cluster."}
+marker.info.lfc <- scoreMarkers(sce.pbmc, colLabels(sce.pbmc), lfc=2)
+chosen2 <- marker.info.lfc[["5"]] # another cluster for some variety.
+chosen2 <- chosen2[order(chosen2$mean.AUC, decreasing=TRUE),]
+chosen2[,c("self.average", "other.average", "mean.AUC")]
+plotDots(sce.pbmc, rownames(chosen2)[1:10], group="label")
+```
+
+Note that the interpretation of the AUC and Cohen's $d$ becomes slightly more complicated when `lfc` is non-zero.
+If `lfc` is positive, a positive Cohen's $d$ and an AUC above 0.5 represents upregulation. 
+However, a negative Cohen's $d$ or AUC below 0.5 may not represent downregulation; it may just indicate that the observed log-fold change is less than the specified `lfc`.
+The converse applies when `lfc` is negative, where the only conclusive interpretation occurs for downregulated genes.
+For the most part, this complication is not too problematic for routine marker detection, as we are mostly interested in upregulated genes with large positive Cohen's $d$ and AUCs above 0.5.
 
 ## Handling blocking factors {#marker-batch}
 
