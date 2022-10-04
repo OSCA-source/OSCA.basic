@@ -221,7 +221,7 @@ all.sets <- GeneSetCollection(all.sets)
 
 library(AUCell)
 rankings <- AUCell_buildRankings(counts(sce.tasic),
-    plotStats=FALSE, verbose=FALSE)
+    plotStats=FALSE, verbose=FALSE, splitByBlocks = TRUE)
 cell.aucs <- AUCell_calcAUC(all.sets, rankings)
 results <- t(assay(cell.aucs))
 head(results)
@@ -284,7 +284,7 @@ For example, applying all of the MSigDB signatures on the Muraro dataset is rath
 muraro.mat <- counts(sce.muraro)
 rownames(muraro.mat) <- rowData(sce.muraro)$symbol
 muraro.rankings <- AUCell_buildRankings(muraro.mat,
-    plotStats=FALSE, verbose=FALSE)
+    plotStats=FALSE, verbose=FALSE, splitByBlocks = TRUE)
 
 # Applying MsigDB to the Muraro dataset, because it's human:
 scsig.aucs <- AUCell_calcAUC(scsigs, muraro.rankings)
