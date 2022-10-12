@@ -1,12 +1,13 @@
 Package: OSCA.basic
 Title: Single-Cell Analysis Basics
 Version: 1.5.0
-Date: 2021-05-16
+Date: 2022-10-13
 Authors@R: c( 
-        person('Robert', 'Amezquita', role = c('aut')), 
-        person('Aaron', 'Lun', role = c('aut', 'cre'), email="infinite.monkeys.with.keyboards@gmail.com"), 
+        person('Robert', 'Amezquita', role = 'aut'), 
+        person('Aaron', 'Lun', role = 'aut', email="infinite.monkeys.with.keyboards@gmail.com"), 
         person('Stephanie', 'Hicks', role = 'aut'), 
-        person('Raphael', 'Gottardo', role = 'aut') 
+        person('Raphael', 'Gottardo', role = 'aut'),
+        person('Peter', 'Hickey', role = 'cre', email="peter.hickey@gmail.com")
     )
 Description: 
     Deploys basic analysis chapters for the "Orchestrating Single Cell Analysis with Bioconductor" book.
