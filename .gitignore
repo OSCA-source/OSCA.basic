@@ -1,2 +1,8 @@
 inst/copy
 vignettes/book
+inst/book/*.html
+inst/book/*.md
+inst/book/libs
+inst/book/*.rds
+inst/book/*_files
+inst/book/*_cache
