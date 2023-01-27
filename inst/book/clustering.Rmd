@@ -126,7 +126,7 @@ reducedDim(sce.pbmc, "force") <- igraph::layout_with_fr(nn.clust.info$objects$gr
 plotReducedDim(sce.pbmc, colour_by="label", dimred="force")
 ```
 
-In addition, the graph can be used to generate detailed diagnostics on the behavior of the graph-based clustering (`link("graph-diagnostics", "OSCA.advanced")`).
+In addition, the graph can be used to generate detailed diagnostics on the behavior of the graph-based clustering (`r link("graph-diagnostics", "OSCA.advanced")`).
 
 ### Adjusting the parameters
 
@@ -195,7 +195,7 @@ clust.eigen <- clusterCells(sce.pbmc, use.dimred="PCA",
     BLUSPARAM=NNGraphParam(cluster.fun="leading_eigen"))
 ```
 
-It is straightforward to compare two clustering strategies to see how they differ (`link("comparing-different-clusterings", "OSCA.advanced")`).
+It is straightforward to compare two clustering strategies to see how they differ (`r link("comparing-different-clusterings", "OSCA.advanced")`).
 For example, Figure \@ref(fig:walktrap-v-others) suggests that Infomap yields finer clusters than Walktrap while fast-greedy yields coarser clusters.
 
 ```{r walktrap-v-others, fig.asp=2, fig.cap="Number of cells assigned to combinations of cluster labels with different community detection algorithms in the PBMC dataset. Each entry of each heatmap represents a pair of labels, coloured proportionally to the log-number of cells with those labels."}
@@ -443,7 +443,7 @@ plot(dend)
 
 This generally corresponds well to the grouping of cells on a $t$-SNE plot (Figure \@ref(fig:tsne-416b)).
 Cluster 2 is split across two visual clusters in the plot but we attribute this to a distortion introduced by $t$-SNE,
-given that this cluster actually has the highest average silhouette width (`link("silhouette-width", "OSCA.advanced")`).
+given that this cluster actually has the highest average silhouette width (`r link("silhouette-width", "OSCA.advanced")`).
 
 ```{r tsne-416b, fig.cap="$t$-SNE plot of the 416B dataset, where each point represents a cell and is coloured according to the identity of the assigned cluster from hierarchical clustering."}
 colLabels(sce.416b) <- factor(hclust.dyn)
