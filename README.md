@@ -21,6 +21,6 @@ The updates are usually handled by the GitHub Action but can be done manually wi
 
 ```r
 rebook::updateDependencies("inst/book", path='DESCRIPTION', 
-    extra=c("Rtsne", "RMTstat", "statmod", "GO.db"))
+    extra=c("Rtsne", "RMTstat", "statmod", "GO.db", "mbkmeans"))
 rebook::configureBook(prefix="Basic")
 ```
