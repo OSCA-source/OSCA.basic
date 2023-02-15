@@ -1,7 +1,7 @@
 Package: OSCA.basic
 Title: Single-Cell Analysis Basics
-Version: 1.7.1
-Date: 2023-01-27
+Version: 1.7.2
+Date: 2023-02-15
 Authors@R: c( 
         person('Robert', 'Amezquita', role = 'aut'), 
         person('Aaron', 'Lun', role = 'aut', email="infinite.monkeys.with.keyboards@gmail.com"), 
