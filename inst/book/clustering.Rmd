@@ -126,7 +126,7 @@ reducedDim(sce.pbmc, "force") <- igraph::layout_with_fr(nn.clust.info$objects$gr
 plotReducedDim(sce.pbmc, colour_by="label", dimred="force")
 ```
 
-In addition, the graph can be used to generate detailed diagnostics on the behavior of the graph-based clustering (`r link("graph-diagnostics", "OSCA.advanced")`).
+In addition, the graph can be used to generate detailed diagnostics on the behavior of the graph-based clustering (`r link("using-graph-modularity", "OSCA.advanced")`).
 
 ### Adjusting the parameters
 
