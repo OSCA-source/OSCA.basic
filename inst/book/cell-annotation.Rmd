@@ -359,16 +359,16 @@ go.out <- goana(unique(entrez.ids[is.de]), species="Mm",
 # Only keeping biological process terms that are not overly general.
 go.out <- go.out[order(go.out$P.DE),]
 go.useful <- go.out[go.out$Ont=="BP" & go.out$N <= 200,]
-head(go.useful[,c(1,3,4)], 40)
+head(go.useful[,c(1,3,4)], 30)
 ```
 
-We see an enrichment for genes involved in lipid storage, lipid synthesis and tube formation.
+We see an enrichment for genes involved in lipid storage and lipid synthesis.
 Given that this is a mammary gland experiment, we might guess that cluster `r chosen.text` contains luminal epithelial cells responsible for milk production and secretion.
 Indeed, a closer examination of the marker list indicates that this cluster upregulates milk proteins _Csn2_ and _Csn3_ (Figure \@ref(fig:violin-milk)).
 
 ```{r, echo=FALSE}
 # Checking that the above statements are correct.
-stopifnot(c("GO:0019915", "GO:0072175", "GO:0019432") %in% head(rownames(go.useful), 40))
+stopifnot(c("GO:0019915", "GO:0019432") %in% head(rownames(go.useful), 30))
 markers.nolfc <- scoreMarkers(sce.mam, lfc=0)
 milk <- markers.nolfc[[chosen]][c("Csn2", "Csn3"),"min.logFC.cohen"]
 stopifnot(all(milk > 0))
