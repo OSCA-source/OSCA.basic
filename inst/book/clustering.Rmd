@@ -547,7 +547,7 @@ plotExpression(sce.pbmc, features=c("CD3E", "CCR7", "CD69", "CD44"),
     x=I(clust.full), colour_by=I(clust.full))
 
 # Repeating modelling and PCA on the subset.
-memory <- 10L
+memory <- 9L
 sce.memory <- sce.pbmc[,clust.full==memory]
 dec.memory <- modelGeneVar(sce.memory)
 sce.memory <- denoisePCA(sce.memory, technical=dec.memory,

@@ -147,7 +147,7 @@ Specifically, genes are ranked _within_ each pairwise comparison based on decrea
 If a gene has a small min-rank, we can conclude that it is one of the top upregulated genes in at least one comparison of $X$ to another cluster.
 
 ```{r, echo=FALSE}
-target <- "4"
+target <- "12"
 ```
 
 Each of these summaries is computed for each effect size, for each gene, and for each cluster.
@@ -158,7 +158,7 @@ the mean and median fall somewhere in between and are reasonable defaults for mo
 The example below uses the median Cohen's $d$ to obtain a ranking of upregulated markers for cluster `r target` (Figure \@ref(fig:pbmc-scored-markers-again)), which probably contains monocytes.
 
 ```{r pbmc-scored-markers-again, fig.height=10, fig.width=8, fig.cap=sprintf("Distribution of expression values across clusters for the top potential marker genes (as determined by the median Cohen's $d$) for cluster %s in the PBMC dataset.", target)}
-chosen <- marker.info[["4"]] # using another cluster, for some variety.
+chosen <- marker.info[["12"]] # using another cluster, for some variety.
 ordered <- chosen[order(chosen$median.logFC.cohen,decreasing=TRUE),]
 head(ordered[,1:4]) # showing basic stats only, for brevity.
 plotExpression(sce.pbmc, features=head(rownames(ordered)), 
@@ -219,17 +219,17 @@ in the example below, `full.AUC` contains the AUCs for the comparisons between c
 
 ```{r}
 marker.info <- scoreMarkers(sce.pbmc, colLabels(sce.pbmc), full.stats=TRUE)
-chosen <- marker.info[["4"]]
+chosen <- marker.info[["12"]]
 chosen$full.AUC
 ```
 
-Say we want to identify the genes that distinguish cluster 4 from other clusters with high _LYZ_ expression.
+Say we want to identify the genes that distinguish cluster 12 from other clusters with high _LYZ_ expression.
 We subset `full.AUC` to the relevant comparisons and sort on our summary statistic of choice to obtain a ranking of markers within this subset.
 This allows us to easily characterize subtle differences between closely related clusters.
 To illustrate, we use the smallest rank from `computeMinRank()` to identify the top DE genes in cluster `r target` compared to the other _LYZ_-high clusters (Figure \@ref(fig:pbmc-grouped-ranked-heat2)). 
 
 ```{r pbmc-grouped-ranked-heat2, fig.cap=sprintf("Heatmap of the centered average log-expression values for the top potential marker genes for cluster %s relative to other _LYZ_-high clusters in the PBMC dataset. The set of markers was selected as those genes with AUC-derived min-ranks less than or equal to 10.", target)}
-lyz.high <- c("4", "6", "8", "9", "14") # based on inspection of the previous Figure.
+lyz.high <- c("2", "4", "7", "12") # based on inspection of the previous Figure.
 subset <- chosen$full.AUC[,colnames(chosen$full.AUC) %in% lyz.high]
 to.show <- subset[computeMinRank(subset) <= 10,]
 to.show
@@ -266,11 +266,11 @@ To favor the detection of such genes, we can compute the effect sizes relative t
 The definition of Cohen's $d$ is generalized to the standardized difference between the observed log-fold change and the specified `lfc` threshold.
 Similarly, the AUC is redefined as the probability of randomly picking an expression value from one cluster that is greater than a random value from the other cluster plus `lfc`.
 A large positive Cohen's $d$ and an AUC above 0.5 can only be obtained if the observed log-fold change between clusters is significantly greater than `lfc`.
-We demonstrate below by obtaining the top markers for cluster 5 in the PBMC dataset with `lfc=2` (Figure \@ref(fig:pbmc-markers-5-lfc)).
+We demonstrate below by obtaining the top markers for cluster 6 in the PBMC dataset with `lfc=2` (Figure \@ref(fig:pbmc-markers-5-lfc)).
 
-```{r pbmc-markers-5-lfc, fig.height=6, fig.width=6, fig.cap="Dot plot of the top potential marker genes (as determined by the mean AUC) for cluster 5 in the PBMC dataset. Each row corrresponds to a marker gene and each column corresponds to a cluster. The size of each dot represents the proportion of cells with detected expression of the gene in the cluster, while the color is proportional to the average expression across all cells in that cluster."}
+```{r pbmc-markers-6-lfc, fig.height=6, fig.width=6, fig.cap="Dot plot of the top potential marker genes (as determined by the mean AUC) for cluster 6 in the PBMC dataset. Each row corrresponds to a marker gene and each column corresponds to a cluster. The size of each dot represents the proportion of cells with detected expression of the gene in the cluster, while the color is proportional to the average expression across all cells in that cluster."}
 marker.info.lfc <- scoreMarkers(sce.pbmc, colLabels(sce.pbmc), lfc=2)
-chosen2 <- marker.info.lfc[["5"]] # another cluster for some variety.
+chosen2 <- marker.info.lfc[["6"]] # another cluster for some variety.
 chosen2 <- chosen2[order(chosen2$mean.AUC, decreasing=TRUE),]
 chosen2[,c("self.average", "other.average", "mean.AUC")]
 plotDots(sce.pbmc, rownames(chosen2)[1:10], group="label")
