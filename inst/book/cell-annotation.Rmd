@@ -422,7 +422,7 @@ plotColData(sce.mam, y=I(aggregated["GO:0019432",]), x="label")
 ```
 
 ```{r, echo=FALSE}
-maxed <- vapply(split(aggregated["GO:0019432",], colLabels(sce.mam)), median, 0)
+maxed <- vapply(split(aggregated["GO:0019432",], colLabels(sce.mam)), mean, 0)
 stopifnot(identical(names(maxed)[which.max(maxed)], '2'))
 ```
 
@@ -433,7 +433,7 @@ This is not uncommon for gene sets that contain both positive and negative regul
 
 ```{r thrsp-violin, fig.cap="Distribution of log-normalized expression values for _Thrsp_ across all cells in each cluster of the mammary gland dataset."}
 # Choose the top-ranking gene in GO:0019432.
-plotExpression(sce.mam, "Thrsp", x="label")
+  plotExpression(sce.mam, "Thrsp", x="label")
 ```
 
 ```{r, echo=FALSE}
