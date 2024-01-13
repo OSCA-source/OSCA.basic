@@ -433,7 +433,7 @@ This is not uncommon for gene sets that contain both positive and negative regul
 
 ```{r thrsp-violin, fig.cap="Distribution of log-normalized expression values for _Thrsp_ across all cells in each cluster of the mammary gland dataset."}
 # Choose the top-ranking gene in GO:0019432.
-  plotExpression(sce.mam, "Thrsp", x="label")
+plotExpression(sce.mam, "Thrsp", x="label")
 ```
 
 ```{r, echo=FALSE}
