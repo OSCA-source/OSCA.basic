@@ -422,7 +422,7 @@ plotColData(sce.mam, y=I(aggregated["GO:0019432",]), x="label")
 ```
 
 ```{r, echo=FALSE}
-maxed <- vapply(split(aggregated["GO:0019432",], colLabels(sce.mam)), median, 0)
+maxed <- vapply(split(aggregated["GO:0019432",], colLabels(sce.mam)), mean, 0)
 stopifnot(identical(names(maxed)[which.max(maxed)], '2'))
 ```
 
