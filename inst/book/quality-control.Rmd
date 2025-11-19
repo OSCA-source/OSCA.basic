@@ -72,7 +72,7 @@ Finally, the `altexps_ERCC_percent` column contains the percentage of reads mapp
 library(SingleCellExperiment)
 # Identifying the mitochondrial transcripts in our SingleCellExperiment.
 location <- rowRanges(sce.416b)
-is.mito <- any(seqnames(location)=="MT")
+is.mito <- as.character(seqnames(location))=="MT"
 
 library(scuttle)
 df <- perCellQCMetrics(sce.416b, subsets=list(Mito=is.mito))
