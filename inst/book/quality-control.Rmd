@@ -73,9 +73,10 @@ library(SingleCellExperiment)
 # Identifying the mitochondrial transcripts in our SingleCellExperiment.
 location <- rowRanges(sce.416b)
 is.mito <- as.character(seqnames(location))=="MT"
+mito.genes <- rownames(sce.416b)[which(is.mito)]
 
 library(scuttle)
-df <- perCellQCMetrics(sce.416b, subsets=list(Mito=is.mito))
+df <- perCellQCMetrics(sce.416b, subsets=list(Mito=mito.genes))
 summary(df$sum)
 summary(df$detected)
 summary(df$subsets_Mito_percent)
@@ -87,7 +88,7 @@ This computes and appends the per-cell QC statistics to the `colData` of the `Si
 allowing us to retain all relevant information in a single object for later manipulation.
 
 ```{r}
-sce.416b <- addPerCellQCMetrics(sce.416b, subsets=list(Mito=is.mito))
+sce.416b <- addPerCellQCMetrics(sce.416b, subsets=list(Mito=mito.genes))
 colnames(colData(sce.416b))
 ```
 
